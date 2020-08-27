@@ -1,32 +1,38 @@
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class Arquivo {
     private File file;
 
-    public DataFile(String fileName) {
+    public Arquivo(String fileName) {
         this.file = new File(fileName);
     }
 
-    public DataFile(File file) {
+    public Arquivo(File file) {
         this.file = file;
     }
 
-    public void save(Person person) {
+    public void save(Pessoa pessoa) {
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            writer.write(person.getFirstName()+"\r\n" + person.getSurname() + "\r\n" + person.getPhoneNumber() + "\r\n" + person.getEmail() +
-                    "\r\n" + person.getAddress() + "\r\n\r\n");
+            writer.write(pessoa.getFirstName()+"\r\n" + pessoa.getSurname() + "\r\n" + pessoa.getPhoneNumber() + "\r\n" + pessoa.getEmail() +
+                    "\r\n" + pessoa.getAddress() + "\r\n\r\n");
         } catch(IOException e) {
             System.out.println(e);
         }
     }
 
-    public List<Person> loadAll() throws IOException {
-        List<Person> people = new ArrayList<Person>();
+    public List<Pessoa> loadAll() throws IOException {
+        List<Pessoa> people = new ArrayList<Pessoa>();
 
         try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String name = null;
             while((name = reader.readLine()) != null) {
-                Person person = new Person(name, reader.readLine(), reader.readLine(), reader.readLine(), reader.readLine());
-                people.add(person);
+                Pessoa pessoa = new Pessoa(name, reader.readLine(), reader.readLine(), reader.readLine(), reader.readLine());
+                people.add(pessoa);
                 reader.readLine();
             }
         }

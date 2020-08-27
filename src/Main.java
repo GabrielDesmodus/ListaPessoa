@@ -1,7 +1,7 @@
 
 public class Main {
 	public static void main(String[] args) {
-		AddressBookController controller = new AddressBookController("data_file.txt");
-        controller.run();
+		Controlador controlador = new Controlador("data_file.txt");
+        controlador.run();
 	}
 }

@@ -16,7 +16,7 @@ public class Controlador {
     private Scanner in;
     private List<Person> people;
 
-    public AddressBookController(DataFile dataFile) {
+    public Controlador(DataFile dataFile) {
         in = new Scanner(System.in);
         this.dataFile = dataFile;
         try {
@@ -26,11 +26,11 @@ public class Controlador {
         }
     }
 
-    public AddressBookController(String fileName) {
+    public Controlador(String fileName) {
         this(new DataFile(fileName));
     }
 
-    public AddressBookController(File file) {
+    public Controlador(File file) {
         this(new DataFile(file));
     }
 
