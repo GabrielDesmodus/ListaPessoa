@@ -1,75 +1,82 @@
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Controlador {
     private enum Action {
-        ADD_PERSON,
-        FIND_PERSON,
-        DISPLAY_ALL,
-        EXIT
+        ADDCLIENTE,
+        PROCURARCLIENTES,
+        MOSTRARCLIENTES,
+        SAIR
     }
 
-    private enum FilterOption {
-        FIRST_NAME,
-        SURNAME
+    private enum OpcaoFiltrada {
+    	NOME,
+    	SOBRENOME
     }
 
-    private DataFile dataFile;
+    private Arquivo arquivo;
     private Scanner in;
-    private List<Person> people;
+    private List<Pessoa> pessoas;
 
-    public Controlador(DataFile dataFile) {
+    public Controlador(Arquivo arquivo) {
         in = new Scanner(System.in);
-        this.dataFile = dataFile;
+        this.arquivo = arquivo;
         try {
-            people = dataFile.loadAll();
+            pessoas = arquivo.loadAll();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Controlador(String fileName) {
-        this(new DataFile(fileName));
+    public Controlador(String nomeArquivo) {
+        this(new Arquivo(nomeArquivo));
     }
 
-    public Controlador(File file) {
-        this(new DataFile(file));
+    public Controlador(File arquivo) {
+        this(new Arquivo(arquivo));
     }
 
-    private List<Person> findPerson(String searchString, FilterOption filter) {
+    private List<Pessoa> buscarPessoa(String busca, OpcaoFiltrada filter) {
         switch (filter) {
-            case FIRST_NAME: return people.stream().filter(person -> person.getSurname().equals(searchString)).collect(Collectors.toList());
-            case SURNAME: return people.stream().filter(person -> person.getFirstName().equals(searchString)).collect(Collectors.toList());
+            case NOME: return pessoas.stream().filter(person -> person.getNome().equals(busca)).collect(Collectors.toList());
+            case SOBRENOME: return pessoas.stream().filter(person -> person.getSobrenome().equals(busca)).collect(Collectors.toList());
             default:
-                System.out.println("Invalid filter option");
+                System.out.println("Opção de filtro inválida");
                 return new ArrayList<>();
         }
     }
 
     public void run() {
         while(true) {
-            Action action = showMainMenuAndGetSelection();
-            switch (action) {
-                case ADD_PERSON:
-                    Person person = getPersonInformation();
-                    dataFile.save(person);
-                    people.add(person);
+            Action acao = mostrarMenu();
+            switch (acao) {
+                case ADDCLIENTE:
+                    Pessoa pessoa = getInfoPessoa();
+                    arquivo.save(pessoa);
+                    pessoas.add(pessoa);
                     break;
-                case FIND_PERSON:
-                    FilterOption selectedFilter = showFindPersonFilterOptionsAndGetSelection();
-                    System.out.print("Enter name: ");
-                    String searchString = in.nextLine();
-                    List<Person> filteredPeople = findPerson(searchString, selectedFilter);
-                    if (filteredPeople.size() == 0) {
-                        System.out.println("No matches");
+                case PROCURARCLIENTES:
+                    OpcaoFiltrada filtroSelecionado = mostrarOpcoesFiltro();
+                    System.out.print("Nome: ");
+                    String busca = in.nextLine();
+                    List<Pessoa> pessoaFiltrada = buscarPessoa(busca, filtroSelecionado);
+                    if (pessoaFiltrada.size() == 0) {
+                        System.out.println("Sem resultados");
                     } else {
-                        for (Person p : filteredPeople)
+                        for (Pessoa p : pessoaFiltrada)
                             System.out.println(p);
                     }
                     break;
-                case DISPLAY_ALL:
-                    System.out.println(this.people);
+                case MOSTRARCLIENTES:
+                    System.out.println(this.pessoas);
                     System.out.println();
                     break;
-                case EXIT:
+                case SAIR:
                     System.out.println("Exiting Program");
                     System.exit(0);
                     break;
@@ -77,52 +84,62 @@ public class Controlador {
         }
     }
 
-    private Action showMainMenuAndGetSelection() {
-        System.out.println("1. Add person");
-        System.out.println("2. Find person");
-        System.out.println("3. Show all contacts");
-        System.out.println("4. Close program");
-        String choice;
+    private Action mostrarMenu() {
+        System.out.println("1. Adicionar cliente");
+        System.out.println("2. Pesquisar cliente");
+        System.out.println("3. Mostrar todos os clientes");
+        System.out.println("4. Fechar programa");
+        String escolha;
         do {
-            choice = in.nextLine();
-            switch (choice) {
-                case "1": return Action.ADD_PERSON;
-                case "2": return Action.FIND_PERSON;
-                case "3": return Action.DISPLAY_ALL;
-                case "4": return Action.EXIT;
-                default: System.out.println("Enter a number from 1 to 4");
+            escolha = in.nextLine();
+            switch (escolha) {
+                case "1": return Action.ADDCLIENTE;
+                case "2": return Action.PROCURARCLIENTES;
+                case "3": return Action.MOSTRARCLIENTES;
+                case "4": return Action.SAIR;
+                default: System.out.println("Digite um número válido");
             }
-        } while (!choice.equals("4"));
+        } while (!escolha.equals("4"));
         return null; //should never reach here
     }
 
-    private Person getPersonInformation() {
-        System.out.println("Enter first name: ");
-        String firstName = in.nextLine();
-        System.out.println("Enter surname: ");
-        String surname = in.nextLine();
-        System.out.println("Enter phone number: ");
-        String phoneNumber = in.nextLine();
-        System.out.println("Enter email: ");
+    private Pessoa getInfoPessoa() {
+        System.out.println("Nome: ");
+        String nome = in.nextLine();
+        System.out.println("Sobrenome: ");
+        String sobrenome = in.nextLine();
+        System.out.println("Telefone: ");
+        String telefone = in.nextLine();
+        System.out.println("Celular: ");
+        String cel = in.nextLine();
+        System.out.println("E-mail: ");
         String email = in.nextLine();
-        System.out.println("Enter addres: ");
-        String address = in.nextLine();
-        return new Person(firstName, surname, phoneNumber, email, address);
+        System.out.println("Endereço: ");
+        String endereco = in.nextLine();
+        System.out.println("Equipamento: ");
+        String equipamento = in.nextLine();
+        System.out.println("Data: ");
+        LocalDate data = LocalDate.parse(in.nextLine());
+        System.out.println("Garantia: ");
+        String garantia = in.nextLine();
+        System.out.println("Serviço: ");
+        String servico = in.nextLine();
+        return new Pessoa(nome, sobrenome, telefone, cel, email, endereco, equipamento, data, garantia, servico);
     }
 
-    private FilterOption showFindPersonFilterOptionsAndGetSelection() {
-        System.out.println("1. Find with name");
-        System.out.println("2. Find with surname");
+    private OpcaoFiltrada mostrarOpcoesFiltro() {
+        System.out.println("1. Procurar por nome");
+        System.out.println("2. Procurar por sobrenome");
         System.out.println();
-        String choice;
+        String escolha;
         do {
-            choice = in.nextLine();
-            switch (choice) {
-                case "1":  return FilterOption.FIRST_NAME;
-                case "2": return FilterOption.SURNAME;
-                default: System.out.print("Choose 1 or 2");
+            escolha = in.nextLine();
+            switch (escolha) {
+                case "1": return OpcaoFiltrada.NOME;
+                case "2": return OpcaoFiltrada.SOBRENOME;
+                default: System.out.print("Escolha uma opção válida");
             }
-        } while (!choice.equals("1") && !choice.equals("2"));
+        } while (!escolha.equals("1") && !escolha.equals("2"));
         return null; //should never reach here
     }
 }
