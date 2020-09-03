@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Pessoa {
@@ -11,11 +12,11 @@ public class Pessoa {
     private String email;
     private String endereco;
     private String equipamento;
-    private String data;
+    private LocalDate data;
     private String garantia;
     private String servico;
 
-    Pessoa(int id, String nome, String sobrenome, String telefone, String cel, String email, String endereco, String equipamento, String data, String garantia, String servico) {
+    Pessoa(int id, String nome, String sobrenome, String telefone, String cel, String email, String endereco, String equipamento, LocalDate data, String garantia, String servico) {
         this.id = id;
         this.nome = nome;
         this.sobrenome = sobrenome;
@@ -29,7 +30,7 @@ public class Pessoa {
         this.servico = servico;
     }
 
-    Pessoa(String nome, String sobrenome, String telefone, String cel, String email, String endereco, String equipamento, String data, String garantia, String servico) {
+    Pessoa(String nome, String sobrenome, String telefone, String cel, String email, String endereco, String equipamento, LocalDate data, String garantia, String servico) {
         this(nextID.getAndIncrement(), nome, sobrenome, telefone, cel, email, endereco, equipamento, data, garantia, servico);
     }
 
@@ -65,7 +66,7 @@ public class Pessoa {
         return equipamento;
     }
 
-    String getData() {
+    LocalDate getData() {
         return data;
     }
 

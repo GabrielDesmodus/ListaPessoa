@@ -19,11 +19,13 @@ public class Arquivo {
         this.file = file;
     }
 
-    public void save(Pessoa pessoa) {
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+    public void saveAll(List<Pessoa> people) {
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {//AGORA O WRITER COMEÇA PELO COMEÇO DO ARQUIVO
+        	for(Pessoa pessoa : people) {//RODA O FOR ATÉ SALVAR TODAS AS PESSOAS NO ARQUIVO
             writer.write(pessoa.getNome()+"\r\n" + pessoa.getSobrenome() + "\r\n" + pessoa.getTelefone() + "\r\n" + pessoa.getCel() + "\r\n" + pessoa.getEmail() 
             + "\r\n" + pessoa.getEndereco() + "\r\n" + pessoa.getEquipamento() + "\r\n" + pessoa.getData() + "\r\n" + pessoa.getGarantia() + "\r\n" + pessoa.getServico()
                         + "\r\n\r\n");
+        	}
         } catch(IOException e) {
             System.out.println(e);
         }

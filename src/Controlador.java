@@ -10,14 +10,20 @@ public class Controlador {
     private enum Action {
         ADDCLIENTE,
         ATUALIZARCLIENTE,//AÇÃO DE ATUALIZAR CLIENTE ADICIONADA
+        DELETECLIENTE,//DELETAR CLIENTE
         PROCURARCLIENTES,
         MOSTRARCLIENTES,
         SAIR
     }
 
     private enum OpcaoFiltrada {
+    	NOMEANDSOBRENOME,
     	NOME,
-    	SOBRENOME
+    	SOBRENOME,
+    	TELEFONE,
+    	CEL,
+    	EMAIL,
+    	ENDERECO
     }
 
     private Arquivo arquivo;
@@ -46,6 +52,11 @@ public class Controlador {
         switch (filter) {
             case NOME: return pessoas.stream().filter(person -> person.getNome().equals(busca)).collect(Collectors.toList());
             case SOBRENOME: return pessoas.stream().filter(person -> person.getSobrenome().equals(busca)).collect(Collectors.toList());
+            case TELEFONE: return pessoas.stream().filter(person -> person.getTelefone().equals(busca)).collect(Collectors.toList());
+            case CEL: return pessoas.stream().filter(person -> person.getCel().equals(busca)).collect(Collectors.toList());
+            case EMAIL: return pessoas.stream().filter(person -> person.getEmail().equals(busca)).collect(Collectors.toList());
+            case ENDERECO: return pessoas.stream().filter(person -> person.getEndereco().equals(busca)).collect(Collectors.toList());
+
             default:
                 System.out.println("Opção de filtro inválida");
                 return new ArrayList<>();
@@ -75,15 +86,26 @@ public class Controlador {
             switch (acao) {
                 case ADDCLIENTE:
                     Pessoa pessoa = getInfoPessoa();
-                    arquivo.save(pessoa);
+                    
                     pessoas.add(pessoa);
                     break;
+                    
                 case ATUALIZARCLIENTE: //AÇÃO PRA CASO PRECISE MODIFICAR AS INFORMAÇÕES DE UM CLIENTE
-                    System.out.print("Nome: ");
-                    String nome = in.nextLine();
-                    System.out.print("Sobrenome: ");
-                    String sobrenome = in.nextLine(); 
-                    List<Pessoa> pessoasFiltradasA = buscarPessoas(nome, sobrenome); // POR ENQUANTO EU SÓ FIZ A OPÇÃO PRA PROCURAR POR NOME E SOBRENOME
+                	OpcaoFiltrada filtroSelecionadoA = mostrarOpcoesFiltro();
+                	List<Pessoa> pessoasFiltradasA;
+                	if(filtroSelecionadoA == OpcaoFiltrada.NOMEANDSOBRENOME) {
+                		System.out.print("Nome: ");
+                        String nome = in.nextLine();
+                        System.out.print("Sobrenome: ");
+                        String sobrenome = in.nextLine(); 
+                        pessoasFiltradasA = buscarPessoas(nome, sobrenome);
+                	}else {
+                		System.out.print("Busca: ");
+                		String busca = in.nextLine();
+                		pessoasFiltradasA = buscarPessoas(busca, filtroSelecionadoA);
+                	}
+                	
+                     // POR ENQUANTO EU SÓ FIZ A OPÇÃO PRA PROCURAR POR NOME E SOBRENOME
                     if (pessoasFiltradasA.size() == 0) { // SE N TIVER NINGUÉM COM O NOME
                         System.out.println("Sem resultados"); 
                     }else if(pessoasFiltradasA.size() == 1){ //SE SÓ TIVER UMA PESSOA COM O NOME JÁ FAZ O BAGULHO TODO DIRETO
@@ -107,7 +129,7 @@ public class Controlador {
                         } while (!escolha.equals("1") && !escolha.equals("2"));
                         
                     }else if(pessoasFiltradasA.size() > 1){ //SE TIVER MAIS DE UMA PESSOA COM MESMO NOME E SOBRENOME
-                    	System.out.println("Existem mais de uma pessoa com o mesmo nome: ");
+                    	System.out.println("Existem mais de uma pessoa com com a mesma informação ");
                     	int i=0;
                     	for(Pessoa p : pessoasFiltradasA) {
                     		i++;
@@ -132,14 +154,78 @@ public class Controlador {
                                 	break;
                                 default: System.out.print("Escolha uma opção válida");
                             }
-                        } while (!escolha.equals("1") && !escolha.equals("2"));
-                    	
-                        
+                        } while (!escolha.equals("1") && !escolha.equals("2"));   
                     }
                 	break;
+                	
+                case DELETECLIENTE: //NOVA AÇÃO
+                	OpcaoFiltrada filtroSelecionadoC = mostrarOpcoesFiltro();
+                	List<Pessoa> pessoasFiltradasC;
+                	if(filtroSelecionadoC == OpcaoFiltrada.NOMEANDSOBRENOME) {
+                		System.out.print("Nome: ");
+                        String nome = in.nextLine();
+                        System.out.print("Sobrenome: ");
+                        String sobrenome = in.nextLine(); 
+                        pessoasFiltradasC = buscarPessoas(nome, sobrenome);
+                	}else {
+                		System.out.print("Busca: ");
+                		String busca = in.nextLine();
+                		pessoasFiltradasC = buscarPessoas(busca, filtroSelecionadoC);
+                	}
+                	
+                    if (pessoasFiltradasC.size() == 0) {
+                        System.out.println("Sem resultados"); 
+                    }else if(pessoasFiltradasC.size() == 1){ 
+                    	System.out.println("Tem certeza que quer deletar esse cliente?");
+                    	System.out.println("1. Sim");
+                        System.out.println("2. Não");
+                        String escolha;
+                        do {
+                            escolha = in.nextLine();
+                            switch (escolha) {
+                                case "1": 
+                                	Pessoa p = pessoasFiltradasC.get(0);
+                                    pessoas.remove(buscarPessoas(p.getID())); 
+                                    break;
+                                
+                                case "2": 
+                                	break;
+                                default: System.out.print("Escolha uma opção válida");
+                            }
+                        } while (!escolha.equals("1") && !escolha.equals("2"));
+                        
+                    }else if(pessoasFiltradasC.size() > 1){ 
+                    	System.out.println("Existem mais de uma pessoa com a mesma informação: ");
+                    	int i=0;
+                    	for(Pessoa p : pessoasFiltradasC) {
+                    		i++;
+                    		System.out.println("\n"+i + " "+ p.getServico()); //RODA O FOR PRA MOSTRAR TODAS AS PESSOAS FILTRADAS E ALGUMA INFO PRA DIFERENCIAR ELAS
+                    	}
+                    	System.out.println("Tem certeza que quer deletar?");
+                    	System.out.println("1. Sim");
+                        System.out.println("2. Não");
+                        String escolha;
+                        do {
+                            escolha = in.nextLine();
+                            switch (escolha) {
+                                case "1": 
+                                	System.out.println("Escolha qual pessoa você deseja deletar");
+                                    int escolha2;
+                                    escolha2 = in.nextInt();
+                                	Pessoa p = pessoasFiltradasC.get(escolha2);
+                                    pessoas.remove(buscarPessoas(p.getID()));
+                                
+                                case "2": 
+                                	break;
+                                default: System.out.print("Escolha uma opção válida");
+                            }
+                        } while (!escolha.equals("1") && !escolha.equals("2"));
+                    }
+                	break;
+                	
                 case PROCURARCLIENTES:
                     OpcaoFiltrada filtroSelecionadoB = mostrarOpcoesFiltro();
-                    System.out.print("Nome: ");
+                    System.out.print("Busca: ");
                     String busca = in.nextLine();
                     List<Pessoa> pessoaFiltradaB = buscarPessoas(busca, filtroSelecionadoB);
                     if (pessoaFiltradaB.size() == 0) {
@@ -149,11 +235,14 @@ public class Controlador {
                             System.out.println(p);
                     }
                     break;
+                    
                 case MOSTRARCLIENTES:
                     System.out.println(this.pessoas);
                     System.out.println();
                     break;
+                    
                 case SAIR:
+                	arquivo.saveAll(pessoas);//AGORA ELE SÓ SALVA NO FINAL
                     System.out.println("Exiting Program");
                     System.exit(0);
                     break;
@@ -209,13 +298,20 @@ public class Controlador {
     private OpcaoFiltrada mostrarOpcoesFiltro() {
         System.out.println("1. Procurar por nome");
         System.out.println("2. Procurar por sobrenome");
-        System.out.println();
+        System.out.println("3. Procurar por telefone");
+        System.out.println("4. Procurar por cel");
+        System.out.println("5. Procurar por email");
+        System.out.println("6. Procurar por endereço");
         String escolha;
         do {
             escolha = in.nextLine();
             switch (escolha) {
                 case "1": return OpcaoFiltrada.NOME;
                 case "2": return OpcaoFiltrada.SOBRENOME;
+                case "4": return OpcaoFiltrada.TELEFONE;//OPÇÃO ADICIONADA
+                case "5": return OpcaoFiltrada.CEL;//OPÇÃO ADICIONADA
+                case "6": return OpcaoFiltrada.EMAIL;//OPÇÃO ADICIONADA
+                case "7": return OpcaoFiltrada.ENDERECO;//OPÇÃO ADICIONADA
                 default: System.out.print("Escolha uma opção válida");
             }
         } while (!escolha.equals("1") && !escolha.equals("2"));
